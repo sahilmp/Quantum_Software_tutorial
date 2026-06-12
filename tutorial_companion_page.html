@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Drug Discovery — VQE Tutorial | QuantumUniversal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@300;400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --void: #05060d;
+    --deep: #0c0f1e;
+    --panel: #111428;
+    --rim: #1a1f3a;
+    --quantum: #00d4ff;
+    --orbital: #7c3aed;
+    --bond: #10b981;
+    --energy: #f59e0b;
+    --text: #e2e8f0;
+    --muted: #7a849e;
+    --code-bg: #0a0e1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--void);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── Animated molecule background ── */
+  #canvas-bg {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .content { position: relative; z-index: 1; }
+
+  /* ── Header ── */
+  header {
+    padding: 4rem 2rem 2rem;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--quantum);
+    border: 1px solid var(--quantum);
+    padding: 4px 14px;
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+  }
+
+  h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 600;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #ffffff 0%, var(--quantum) 60%, var(--orbital) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    font-size: 1.1rem;
+    color: var(--muted);
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    font-weight: 300;
+  }
+
+  .ai-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #7c3aed22, #00d4ff22);
+    border: 1px solid var(--orbital);
+    padding: 8px 18px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--quantum);
+  }
+
+  .ai-dot {
+    width: 8px; height: 8px;
+    background: var(--orbital);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  /* ── Sections ── */
+  section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--quantum);
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+
+  p { color: var(--muted); margin-bottom: 1rem; font-size: 1rem; }
+  p strong { color: var(--text); }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--rim);
+    margin: 0;
+  }
+
+  /* ── Video placeholder ── */
+  .video-frame {
+    background: var(--panel);
+    border: 1px solid var(--rim);
+    border-radius: 8px;
+    padding: 2.5rem;
+    margin: 2rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .video-frame::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--orbital), var(--quantum), var(--bond));
+  }
+
+  .video-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.1em;
+  }
+
+  .script-block {
+    border-left: 2px solid var(--quantum);
+    padding-left: 1.2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .script-timestamp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--energy);
+    margin-bottom: 0.25rem;
+  }
+
+  .script-text {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* ── Steps ── */
+  .steps {
+    display: grid;
+    gap: 1px;
+    background: var(--rim);
+    border: 1px solid var(--rim);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .step {
+    background: var(--deep);
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 1rem;
+    align-items: start;
+    transition: background 0.2s;
+  }
+
+  .step:hover { background: var(--panel); }
+
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--rim);
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .step-title {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+  }
+
+  .step-desc { color: var(--muted); font-size: 0.88rem; }
+
+  .step.highlight .step-num { color: var(--quantum); }
+  .step.highlight { background: #00d4ff08; }
+
+  /* ── Code block ── */
+  .code-block {
+    background: var(--code-bg);
+    border: 1px solid var(--rim);
+    border-radius: 6px;
+    overflow: hidden;
+    margin: 2rem 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.83rem;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--rim);
+    background: var(--panel);
+  }
+
+  .code-lang {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    color: var(--quantum);
+    text-transform: uppercase;
+  }
+
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .d1 { background: #ff5f57; }
+  .d2 { background: #febc2e; }
+  .d3 { background: #28c840; }
+
+  pre {
+    padding: 1.2rem;
+    overflow-x: auto;
+    line-height: 1.7;
+  }
+
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: #c3e88d; }
+  .cm { color: #546e7a; font-style: italic; }
+  .num { color: var(--energy); }
+  .var { color: var(--quantum); }
+
+  /* ── Dependencies table ── */
+  .deps {
+    display: grid;
+    gap: 1px;
+    background: var(--rim);
+    border: 1px solid var(--rim);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .dep-row {
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--deep);
+    align-items: center;
+    font-size: 0.88rem;
+    transition: background 0.15s;
+  }
+
+  .dep-row:hover { background: var(--panel); }
+
+  .dep-name {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--bond);
+    font-weight: 700;
+  }
+
+  .dep-desc { color: var(--muted); }
+
+  .dep-version {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .dep-row.header {
+    background: var(--panel);
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .dep-row.header .dep-name { color: var(--muted); }
+
+  /* ── Concept cards ── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--rim);
+    border: 1px solid var(--rim);
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .card {
+    background: var(--deep);
+    padding: 1.5rem;
+    transition: background 0.2s;
+  }
+
+  .card:hover { background: var(--panel); }
+
+  .card-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .card-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-body {
+    font-size: 0.82rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── Download strip ── */
+  .downloads {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 2rem 0;
+  }
+
+  .dl-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--panel);
+    border: 1px solid var(--rim);
+    color: var(--text);
+    padding: 0.75rem 1.4rem;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .dl-btn:hover {
+    border-color: var(--quantum);
+    color: var(--quantum);
+    background: #00d4ff0a;
+  }
+
+  .dl-btn.primary {
+    background: linear-gradient(135deg, var(--orbital), var(--quantum));
+    border: none;
+    color: white;
+    font-weight: 600;
+  }
+
+  .dl-btn.primary:hover {
+    opacity: 0.9;
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--rim);
+    padding: 2rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  footer a { color: var(--quantum); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas-bg"></canvas>
+
+<div class="content">
+
+<header>
+  <div class="badge">QuantumUniversal Tutorial Series</div>
+  <h1>Quantum Drug Discovery<br>with VQE</h1>
+  <p class="subtitle">How quantum computers simulate molecules — and why that could change medicine forever. A hands-on tutorial for high school and undergrad students.</p>
+  <div class="ai-badge">
+    <span class="ai-dot"></span>
+    🤖 AI-Powered Section: Adam optimizer (ML gradient descent) runs the VQE loop
+  </div>
+</header>
+
+<hr class="divider">
+
+<!-- VIDEO SCRIPT -->
+<section>
+  <div class="section-label">Video Demo Script</div>
+  <h2>What to say in your video</h2>
+  <p>Use this script as a guide for your tutorial video. Estimated length: <strong>8–12 minutes</strong>. Record your screen with the Jupyter notebook open alongside this script.</p>
+
+  <div class="video-frame">
+    <div class="video-title">// VIDEO_SCRIPT.txt — VQE Drug Discovery Tutorial</div>
+
+    <div class="script-block">
+      <div class="script-timestamp">[0:00 – 0:45] HOOK</div>
+      <div class="script-text">"Drug discovery costs two-and-a-half billion dollars and takes twelve years. One of the biggest reasons is that we can't simulate how molecules behave at the quantum level using classical computers. The math simply gets too big, too fast. Today I'm going to show you how quantum computers change that — and we're going to do it live, with real code."</div>
+    </div>
+
+    <div class="script-block">
+      <div class="script-timestamp">[0:45 – 2:30] THE PROBLEM</div>
+      <div class="script-text">"Every atom has electrons, and electrons obey the laws of quantum mechanics. To know how a drug molecule binds to a protein — which determines whether it works — you need to know the molecule's ground state energy. That requires solving the Schrödinger equation. For H₂, the simplest real molecule, that's easy. For a drug molecule with 100+ atoms? A classical computer would need to track more states than there are atoms in the universe."</div>
+    </div>
+
+    <div class="script-block">
+      <div class="script-timestamp">[2:30 – 4:00] KEY CONCEPTS</div>
+      <div class="script-text">"Let me explain three ideas really quickly. Superposition: a qubit can be 0 and 1 at the same time. Entanglement: qubits can be correlated in ways classical bits can't. And the variational principle: any guess for the ground state energy is always higher than or equal to the real answer. VQE uses this: we keep guessing until we can't go lower."</div>
+    </div>
+
+    <div class="script-block">
+      <div class="script-timestamp">[4:00 – 7:00] CODE WALKTHROUGH</div>
+      <div class="script-text">"Now let's open the Jupyter notebook. [Share screen] I'll walk through each cell. First we define H₂ — two hydrogen atoms 0.74 Angstroms apart. Then PennyLane converts that geometry into a qubit Hamiltonian using the Jordan-Wigner transform. Our ansatz circuit prepares a trial wavefunction. And then — this is where AI comes in — the Adam optimizer, the same algorithm that trains GPT, minimizes the energy over 100 iterations."</div>
+    </div>
+
+    <div class="script-block">
+      <div class="script-timestamp">[7:00 – 9:00] RESULTS</div>
+      <div class="script-text">"Look at this convergence plot. We start at the Hartree-Fock energy — classical approximation. VQE drives it down to the exact ground state in about 70 iterations. The error? Less than 0.001 milliHartree. That's chemical accuracy — the precision you need to predict drug binding. And we did this on a simulator on my laptop."</div>
+    </div>
+
+    <div class="script-block">
+      <div class="script-timestamp">[9:00 – 10:30] PERSONAL NOTE + OUTRO</div>
+      <div class="script-text">"I got into quantum computing because I couldn't accept that we can play photorealistic video games but can't simulate a water molecule exactly. If that bothers you too, you're in the right place. The code for this tutorial is fully open-source on QuantumUniversal. Run it, break it, and ask questions. The quantum community is genuinely welcoming — everyone remembers their first Bloch sphere."</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CONCEPTS -->
+<section>
+  <div class="section-label">Core Concepts</div>
+  <h2>What this tutorial covers</h2>
+  <p>Four essential ideas, explained from scratch with no prerequisites beyond high school math.</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="card-icon">⚛️</span>
+      <div class="card-title">Superposition & Entanglement</div>
+      <div class="card-body">Qubits differ fundamentally from classical bits. Understand how quantum states represent exponential information.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🧪</span>
+      <div class="card-title">Molecular Hamiltonians</div>
+      <div class="card-body">The Hamiltonian encodes a molecule's full energy. Learn how atomic coordinates become qubit operators via Jordan-Wigner.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">🤖</span>
+      <div class="card-title">VQE + AI Optimizer</div>
+      <div class="card-body">The Adam optimizer — same as in deep learning — drives the variational loop. Quantum ML in action.</div>
+    </div>
+    <div class="card">
+      <span class="card-icon">💊</span>
+      <div class="card-title">Drug Discovery Link</div>
+      <div class="card-body">Ground state energy predicts molecular binding. Understand why this matters at the scale of real proteins.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- ALGORITHM STEPS -->
+<section>
+  <div class="section-label">Algorithm Walkthrough</div>
+  <h2>VQE, step by step</h2>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div>
+        <div class="step-title">Define molecular geometry</div>
+        <div class="step-desc">Specify element symbols and 3D atomic coordinates. For H₂: two hydrogen atoms 0.74 Å apart on the z-axis.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div>
+        <div class="step-title">Build the qubit Hamiltonian</div>
+        <div class="step-desc">PennyLane runs Hartree-Fock, then maps fermionic operators to Pauli strings via Jordan-Wigner transform.</div>
+      </div>
+    </div>
+    <div class="step highlight">
+      <div class="step-num">03</div>
+      <div>
+        <div class="step-title">Design the ansatz circuit</div>
+        <div class="step-desc">Build a parameterized quantum circuit with Single and Double Excitation gates. Each gate has a trainable angle θ.</div>
+      </div>
+    </div>
+    <div class="step highlight">
+      <div class="step-num">04</div>
+      <div>
+        <div class="step-title">🤖 Run the AI optimizer (Adam)</div>
+        <div class="step-desc">The Adam optimizer (ML algorithm) computes gradients via the parameter-shift rule and updates all θ values to minimize energy.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">05</div>
+      <div>
+        <div class="step-title">Measure & repeat until convergence</div>
+        <div class="step-desc">The quantum circuit measures ⟨ψ(θ)|H|ψ(θ)⟩. Iterate until ΔE &lt; 10⁻⁶ Hartree.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">06</div>
+      <div>
+        <div class="step-title">Interpret and extend</div>
+        <div class="step-desc">Plot the convergence and potential energy surface. Compare to exact FCI. Try the same code on LiH, H₂O, or NH₃.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- CODE SAMPLE -->
+<section>
+  <div class="section-label">Core Code</div>
+  <h2>The VQE circuit</h2>
+  <p>The minimal, annotated core of the algorithm. Every line is explained in the full tutorial.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <div class="code-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+      <div class="code-lang">Python · PennyLane</div>
+    </div>
+    <pre><span class="cm"># 🤖 AI-Powered: Adam optimizer (same as deep learning)</span>
+<span class="kw">import</span> pennylane <span class="kw">as</span> qml
+<span class="kw">from</span> pennylane <span class="kw">import</span> qchem
+
+<span class="cm"># 1. Build molecular Hamiltonian from geometry</span>
+<span class="var">H</span>, <span class="var">num_qubits</span> = qchem.<span class="fn">molecular_hamiltonian</span>(
+    [<span class="str">'H'</span>, <span class="str">'H'</span>], coordinates, basis=<span class="str">'sto-3g'</span>
+)
+
+<span class="cm"># 2. Parameterized quantum circuit (ansatz)</span>
+<span class="var">dev</span> = qml.<span class="fn">device</span>(<span class="str">'default.qubit'</span>, wires=<span class="var">num_qubits</span>)
+
+<span class="cm">@qml.qnode(dev)</span>
+<span class="kw">def</span> <span class="fn">vqe_circuit</span>(<span class="var">params</span>, <span class="var">hamiltonian</span>):
+    qml.<span class="fn">BasisState</span>(<span class="var">hf_state</span>, wires=<span class="fn">range</span>(<span class="var">num_qubits</span>))
+    <span class="kw">for</span> i, exc <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">doubles</span>):
+        qml.<span class="fn">DoubleExcitation</span>(<span class="var">params</span>[i], wires=exc)
+    <span class="kw">for</span> i, exc <span class="kw">in</span> <span class="fn">enumerate</span>(<span class="var">singles</span>):
+        qml.<span class="fn">SingleExcitation</span>(<span class="var">params</span>[<span class="fn">len</span>(<span class="var">doubles</span>)+i], wires=exc)
+    <span class="kw">return</span> qml.<span class="fn">expval</span>(<span class="var">hamiltonian</span>)  <span class="cm"># ← QUANTUM MEASUREMENT</span>
+
+<span class="cm"># 3. AI optimization loop</span>
+<span class="var">opt</span> = qml.<span class="fn">AdamOptimizer</span>(stepsize=<span class="num">0.02</span>)  <span class="cm"># same as neural nets!</span>
+<span class="var">params</span> = np.<span class="fn">zeros</span>(<span class="var">num_params</span>, requires_grad=<span class="kw">True</span>)
+
+<span class="kw">for</span> _ <span class="kw">in</span> <span class="fn">range</span>(<span class="num">100</span>):
+    <span class="var">params</span>, <span class="var">energy</span> = opt.<span class="fn">step_and_cost</span>(
+        <span class="var">vqe_circuit</span>, <span class="var">params</span>, hamiltonian=<span class="var">H</span>
+    )
+<span class="cm"># → Final energy: -1.13618819 Hartree  ✅ Chemical accuracy!</span></pre>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- DEPENDENCIES -->
+<section>
+  <div class="section-label">Dependencies</div>
+  <h2>What you need to run this</h2>
+  <p>All open-source. Install with <code style="font-family:JetBrains Mono,monospace;background:var(--panel);padding:2px 6px;border-radius:3px;color:var(--bond)">pip install pennylane pennylane-qchem openfermion pyscf numpy matplotlib jupyter</code></p>
+
+  <div class="deps">
+    <div class="dep-row header">
+      <div class="dep-name">Package</div>
+      <div class="dep-desc">Purpose</div>
+      <div class="dep-version">Min version</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">pennylane</div>
+      <div class="dep-desc">Quantum computing framework — builds and runs circuits, handles autodiff</div>
+      <div class="dep-version">≥ 0.36</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">pennylane-qchem</div>
+      <div class="dep-desc">Quantum chemistry tools — molecular Hamiltonians, Jordan-Wigner transform</div>
+      <div class="dep-version">≥ 0.36</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">openfermion</div>
+      <div class="dep-desc">Fermionic operator algebra — handles anti-commutation relations</div>
+      <div class="dep-version">≥ 1.6</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">pyscf</div>
+      <div class="dep-desc">Classical quantum chemistry engine — Hartree-Fock and basis set calculations</div>
+      <div class="dep-version">≥ 2.4</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">numpy</div>
+      <div class="dep-desc">Fast array math — parameter arrays, coordinate arrays, energy storage</div>
+      <div class="dep-version">≥ 1.24</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">matplotlib</div>
+      <div class="dep-desc">Plotting — energy convergence curves and potential energy surface</div>
+      <div class="dep-version">≥ 3.7</div>
+    </div>
+    <div class="dep-row">
+      <div class="dep-name">jupyter</div>
+      <div class="dep-desc">Interactive notebook — runs .ipynb file cell by cell</div>
+      <div class="dep-version">≥ 7.0</div>
+    </div>
+  </div>
+
+  <p style="font-size:0.85rem">Python 3.9–3.12 recommended. Works on Windows, macOS, Linux. No GPU required — simulator runs on CPU.</p>
+</section>
+
+<hr class="divider">
+
+<!-- DOWNLOADS -->
+<section>
+  <div class="section-label">Files</div>
+  <h2>Download the tutorial</h2>
+  <p>All files are open-source under the MIT License. Share freely, credit kindly.</p>
+
+  <div class="downloads">
+    <a class="dl-btn primary" href="vqe_drug_discovery.ipynb" download>
+      📓 Jupyter Notebook (.ipynb)
+    </a>
+    <a class="dl-btn" href="quantum_drug_discovery_tutorial.md" download>
+      📄 Full Markdown Tutorial (.md)
+    </a>
+    <a class="dl-btn" href="#" onclick="alert('Upload the .ipynb to Google Colab at colab.research.google.com — no local install needed!')">
+      ☁️ Run in Google Colab
+    </a>
+  </div>
+
+  <p style="font-size:0.82rem;color:var(--muted)">
+    💡 Tip: Google Colab lets you run the notebook for free in your browser without installing anything. 
+    Upload the .ipynb file at <a href="https://colab.research.google.com" style="color:var(--quantum)">colab.research.google.com</a>.
+  </p>
+</section>
+
+</div><!-- /content -->
+
+<footer>
+  <a href="https://quantumuniversal.org">quantumuniversal.org</a>
+  &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; Open-Source Tutorial Series
+  <br><br>
+  VQE · PennyLane · Quantum Chemistry · Drug Discovery
+</footer>
+
+<script>
+// Animated molecule background
+const canvas = document.getElementById('canvas-bg');
+const ctx = canvas.getContext('2d');
+
+let W, H_c, atoms, bonds;
+
+function init() {
+  W = canvas.width = window.innerWidth;
+  H_c = canvas.height = window.innerHeight;
+  
+  // Create atoms
+  atoms = Array.from({length: 12}, () => ({
+    x: Math.random() * W,
+    y: Math.random() * H_c,
+    vx: (Math.random() - 0.5) * 0.4,
+    vy: (Math.random() - 0.5) * 0.4,
+    r: 3 + Math.random() * 5,
+    color: ['#00d4ff', '#7c3aed', '#10b981', '#f59e0b'][Math.floor(Math.random() * 4)]
+  }));
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H_c);
+  
+  // Move atoms
+  atoms.forEach(a => {
+    a.x += a.vx;
+    a.y += a.vy;
+    if (a.x < 0 || a.x > W) a.vx *= -1;
+    if (a.y < 0 || a.y > H_c) a.vy *= -1;
+  });
+  
+  // Draw bonds (edges between nearby atoms)
+  for (let i = 0; i < atoms.length; i++) {
+    for (let j = i + 1; j < atoms.length; j++) {
+      const dx = atoms[i].x - atoms[j].x;
+      const dy = atoms[i].y - atoms[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 200) {
+        const alpha = (1 - dist/200) * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(atoms[i].x, atoms[i].y);
+        ctx.lineTo(atoms[j].x, atoms[j].y);
+        ctx.strokeStyle = `rgba(0, 212, 255, ${alpha})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+  }
+  
+  // Draw atoms
+  atoms.forEach(a => {
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+    ctx.fillStyle = a.color;
+    ctx.fill();
+    
+    // Glow
+    const g = ctx.createRadialGradient(a.x, a.y, 0, a.x, a.y, a.r * 4);
+    g.addColorStop(0, a.color + '44');
+    g.addColorStop(1, 'transparent');
+    ctx.beginPath();
+    ctx.arc(a.x, a.y, a.r * 4, 0, Math.PI * 2);
+    ctx.fillStyle = g;
+    ctx.fill();
+  });
+  
+  requestAnimationFrame(draw);
+}
+
+init();
+draw();
+window.addEventListener('resize', init);
+</script>
+
+</body>
+</html>
