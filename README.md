@@ -605,12 +605,6 @@ Training parameters: 3
 Single excitations: [[0, 2], [1, 3]]
 Double excitations: [[0, 1, 2, 3]]
 
-Running VQE optimization...
-  Step   0: E = -1.11655049 Ha
-  Step  20: E = -1.13585031 Ha
-  Step  40: E = -1.13615274 Ha
-  Step  60: E = -1.13618641 Ha
-  Converged at step 68
 
 ✅ Final Energy: -0.886831 Hartree
    Reference:    -1.13618819 Hartree
