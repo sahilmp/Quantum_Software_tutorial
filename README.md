@@ -1,7 +1,6 @@
 # 🔬 Quantum Computing for Drug Discovery: Finding the Ground State of Molecules
 
-**Tutorial Series: Quantum Applications in Real Life**
-*QuantumUniversal Open-Source Tutorial*
+**Tutorial : Quantum Applications in Real Life**
 
 ---
 
@@ -696,11 +695,11 @@ Quantum computing found me during a chemistry class when a professor mentioned o
 
 That gap felt wrong. And important.
 
-I started with YouTube videos (3Blue1Brown's linear algebra series, then IBM's Qiskit tutorials), then took an online course, then entered a hackathon with a team where none of us really knew what we were doing — and that was fine. The quantum community is genuinely welcoming to newcomers, possibly because everyone remembers how confusing their first encounter with a Bloch sphere was.
+I started with YouTube videos (3Blue1Brown's linear algebra series, then IBM's Qiskit tutorials), then took an online course, then entered a hackathon with a team where none of us really knew what we were doing — and that was fine.The quantum community is genuinely welcoming to newcomers, possibly because everyone remembers how confusing their first encounter with a Bloch sphere was. My path has been an interesting one, exploring different domains which can incorporate quantum computing- starting from relationship between bits to qubits and basic linear algebra to various domains like quantum simulations(especially related to molecules), quantum machine learning(with the Machine learning and AI boom going on), optimization and combinatorial problems using quantum computing(QUBO) and quantum communication and security(QKD and PQC). 
 
 The most important thing I learned: **you don't need a physics PhD to contribute.** The field needs people who can explain it clearly, who can build good software tools, who can find new application domains. If you're reading this, you're already ahead of where I was.
 
-The molecules VQE simulates today are tiny. But the molecules it will simulate in 10 years could cure diseases we currently call incurable. You could be part of that.
+The molecules VQE simulated today are tiny. But the molecules it will simulate in 10 years could cure diseases we currently call incurable. You could be part of that.
 
 Start with one tutorial. Break something. Ask a question on the forums. Repeat.
 
@@ -716,8 +715,3 @@ Start with one tutorial. Break something. Ask a question on the forums. Repeat.
 6. Aspuru-Guzik, A. et al. (2005). "Simulated Quantum Computation of Molecular Energies." *Science*, 309(5741).
 
 ---
-
-*This tutorial is open-source under the MIT License. Share freely, credit kindly.*
-*Created for the QuantumUniversal Tutorial Series.*
-
-**🌐 quantumuniversal.org | 🔗 github.com/quantumuniversal**
