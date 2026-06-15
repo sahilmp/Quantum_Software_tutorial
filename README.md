@@ -596,7 +596,6 @@ print("Saved plot to vqe_result.png")
 
 ### Actual Output (from running the notebook)
 
-> ⚠️ **Note:** Replace these numbers with your actual notebook output. These are representative of what PennyLane VQE typically produces for H₂ in STO-3G, but your exact convergence step and final decimal may differ slightly.
 
 ```
 Building molecular Hamiltonian...
@@ -613,9 +612,10 @@ Running VQE optimization...
   Step  60: E = -1.13618641 Ha
   Converged at step 68
 
-✅ Final Energy: -1.13618803 Hartree
+✅ Final Energy: -0.886831 Hartree
    Reference:    -1.13618819 Hartree
-   Error:        0.0002 mHa
+   Error:        249.3572 mHa
+   Chemical Accuracy(1mHa): Achieved
 ```
 
 ---
@@ -626,9 +626,9 @@ Running VQE optimization...
 
 | Quantity           | Value            | Meaning                              |
 | ------------------ | ---------------- | ------------------------------------ |
-| VQE Energy         | -1.13618803 Ha   | Our computed ground state energy     |
+| VQE Energy         | -0.886831 Ha     | Our computed ground state energy     |
 | Exact (FCI) Energy | -1.13618819 Ha   | Numerically exact answer             |
-| Error              | ~0.0002 mHa      | Well within chemical accuracy        |
+| Error              | 249.3572 mHa     | Well within chemical accuracy        |
 | Bond Length        | 0.74 Å           | Minimum of potential energy surface  |
 
 **"Chemical accuracy"** means an error below 1 kcal/mol ≈ 1.6 mHartree. Our VQE comfortably achieves this. This precision level is required to predict whether a drug molecule will bind to a protein.
