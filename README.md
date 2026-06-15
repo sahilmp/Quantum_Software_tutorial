@@ -717,9 +717,10 @@ Start with one tutorial. Break something. Ask a question on the forums. Repeat.
 In line with unitaryHACK's AI contribution guidelines, here is a transparent account of how AI was used in this tutorial:
 
 **What AI helped with:**
-- **Initial structure and outline:** I used Claude (Anthropic) to help scaffold the overall tutorial structure — the section order, the table layout for qubit comparisons, and the VQE algorithm flowchart ASCII art. These were then reviewed and edited.
+- **Initial structure and outline:** I used Claude (Anthropic) to help scaffold the overall tutorial structure — the section order, the table layout for qubit comparisons and the VQE algorithm flowchart ASCII art. These were then reviewed and edited.
 - **Code comments:** Some of the inline code comments were drafted with AI assistance, then checked against the PennyLane documentation and corrected where needed.
 - **Fixing LaTeX/math notation:** AI was used to format a few of the equation blocks (Schrödinger equation, variational principle) consistently.
+- **Plotting and debugging the code:** I used AI(claude) to help me with few errors I was facing(both syntctical and logical) while writing the code. I also used Claude to help me with plotting the graphs so that they look attractive enough to the viewers.
 
 **What AI did NOT do:**
 - The code itself was written and run by me. All notebook outputs are real — they came from executing the cells on my machine.
