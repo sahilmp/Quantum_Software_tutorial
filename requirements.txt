@@ -1,0 +1,31 @@
+# =============================================================
+# Requirements for: Quantum Drug Discovery with VQE Tutorial
+# Tutorial: https://github.com/sahilmp/Quantum_Software_tutorial
+# =============================================================
+# Install all dependencies with:
+#   pip install -r requirements.txt
+#
+# Tested on Python 3.10+
+# =============================================================
+
+# --- Core Quantum Computing ---
+pennylane>=0.38.0          # Quantum ML framework (circuits, autodiff, optimizers)
+pennylane-qchem>=0.38.0    # Molecular Hamiltonians, Jordan-Wigner transforms
+
+# --- Classical Quantum Chemistry Backend ---
+pyscf>=2.4.0               # Required by pennylane-qchem for Hartree-Fock integrals
+openfermion>=1.6.0         # Fermionic operator algebra (used internally by qchem)
+
+# --- Scientific Computing Stack ---
+numpy>=1.24.0              # Array operations, parameter vectors
+scipy>=1.11.0              # Optimization routines (used by some PennyLane optimizers)
+matplotlib>=3.7.0          # Plotting convergence curves and PES
+
+# --- Jupyter Notebook ---
+jupyter>=1.0.0             # To run vqe_drug_discovery.ipynb
+notebook>=7.0.0            # Jupyter notebook server
+
+# --- Optional: Real Hardware Backends ---
+# Uncomment below if you want to run on IBM Quantum hardware
+# pennylane-qiskit>=0.38.0
+# qiskit-ibm-runtime>=0.20.0
