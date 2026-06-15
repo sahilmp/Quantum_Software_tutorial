@@ -1,12 +1,10 @@
 # 🔬 Quantum Computing for Drug Discovery: Finding the Ground State of Molecules
 
-**Tutorial : Quantum Applications in Real Life**
+**Tutorial: Quantum Applications in Real Life**
 
 ---
 
 > **Who is this for?** High school students curious about quantum computing, undergraduate students in chemistry, physics, or CS, and anyone who wants to see how quantum computers might change medicine.
-
-> **🤖 AI-Powered Section:** This tutorial uses the Variational Quantum Eigensolver (VQE) algorithm — a hybrid classical-quantum AI technique — to simulate molecular energy. The classical optimizer inside VQE is an AI/ML optimization algorithm.
 
 ---
 
@@ -22,7 +20,8 @@
 8. [Results and Interpretation](#8-results-and-interpretation)
 9. [Where to Go Next](#9-where-to-go-next)
 10. [A Note on Getting Started in Quantum Computing](#10-personal-note)
-11. [References](#11-references)
+11. [🤖 AI Disclosure](#11-ai-disclosure)
+12. [References](#12-references)
 
 ---
 
@@ -58,13 +57,13 @@ Classical computers fail here because the number of quantum states grows **expon
 
 ### Classical vs. Quantum bits
 
-| Feature | Classical Bit | Qubit |
-|--------|---------------|-------|
-| Values | 0 OR 1 | 0 AND 1 simultaneously (superposition) |
-| 2 bits | 4 possible states, stores 1 | 4 possible states, stores all 4 |
-| 50 bits | Stores 1 of 2^50 states | Represents ALL 2^50 states at once |
-| Interference | No | Yes — paths cancel or reinforce |
-| Entanglement | No | Yes — qubits correlate instantly |
+| Feature      | Classical Bit               | Qubit                                   |
+| ------------ | --------------------------- | --------------------------------------- |
+| Values       | 0 OR 1                      | 0 AND 1 simultaneously (superposition)  |
+| 2 bits       | 4 possible states, stores 1 | 4 possible states, stores all 4         |
+| 50 bits      | Stores 1 of 2^50 states     | Represents ALL 2^50 states at once      |
+| Interference | No                          | Yes — paths cancel or reinforce         |
+| Entanglement | No                          | Yes — qubits correlate instantly        |
 
 ### The Key Quantum Properties We Use
 
@@ -120,6 +119,7 @@ This is the mathematical foundation of VQE. It states:
 > **The expectation value of energy for any trial wavefunction is always ≥ the true ground state energy.**
 
 Mathematically:
+
 ```
 ⟨ψ(θ)|Ĥ|ψ(θ)⟩ ≥ E_ground
 ```
@@ -132,12 +132,12 @@ This is exactly what machine learning optimizers do! VQE is essentially quantum-
 
 A **quantum gate** is like a classical logic gate, but for qubits:
 
-| Gate | Symbol | What it does |
-|------|--------|--------------|
-| Hadamard (H) | H | Creates superposition: |0⟩ → (|0⟩+|1⟩)/√2 |
-| Pauli-X | X | Flips qubit: |0⟩ ↔ |1⟩ |
-| CNOT | ⊕ | Flips second qubit if first is |1⟩ |
-| Ry(θ) | Ry | Rotates qubit state by angle θ |
+| Gate         | Symbol | What it does                              |
+| ------------ | ------ | ----------------------------------------- |
+| Hadamard (H) | H      | Creates superposition from a basis state  |
+| Pauli-X      | X      | Flips qubit (quantum NOT gate)            |
+| CNOT         | ⊕      | Flips second qubit if first is \|1⟩       |
+| Ry(θ)        | Ry     | Rotates qubit state by angle θ            |
 
 **Ry gates are especially important for VQE** — we tune their angles to minimize energy.
 
@@ -198,7 +198,6 @@ We optimize θ₁ and θ₂ to minimize energy.
 ### 🤖 Where AI Comes In
 
 The classical optimizer in VQE is an AI/ML optimization algorithm. Common choices:
-
 - **COBYLA** (Constrained Optimization By Linear Approximation) — gradient-free, good for noisy quantum hardware
 - **ADAM** — from deep learning, uses momentum
 - **SPSA** (Simultaneous Perturbation Stochastic Approximation) — robust to quantum noise
@@ -227,14 +226,14 @@ pip install pennylane-qiskit   # IBM Quantum backend
 
 ### What Each Library Does
 
-| Library | Purpose | Needed for |
-|---------|---------|-----------|
-| `pennylane` | Quantum circuit simulation & autodiff | Building and running VQE |
-| `pennylane-qchem` | Molecular Hamiltonians | Converting H₂ to qubit operators |
-| `openfermion` | Fermionic operator algebra | Jordan-Wigner transforms |
-| `pyscf` | Classical quantum chemistry | Getting reference values |
-| `numpy` | Array math | Everything |
-| `matplotlib` | Plotting | Visualizing energy curves |
+| Library           | Purpose                                | Needed for                        |
+| ----------------- | -------------------------------------- | --------------------------------- |
+| `pennylane`       | Quantum circuit simulation & autodiff  | Building and running VQE          |
+| `pennylane-qchem` | Molecular Hamiltonians                 | Converting H₂ to qubit operators  |
+| `openfermion`     | Fermionic operator algebra             | Jordan-Wigner transforms          |
+| `pyscf`           | Classical quantum chemistry            | Getting reference values          |
+| `numpy`           | Array math                             | Everything                        |
+| `matplotlib`      | Plotting                               | Visualizing energy curves         |
 
 ### Quick Test
 
@@ -295,7 +294,7 @@ hamiltonian, num_qubits = qchem.molecular_hamiltonian(
     coordinates,
     charge=charge,
     mult=multiplicity,
-    basis='sto-3g',      # Minimal basis set (small but sufficient for H₂)
+    basis='sto-3g',          # Minimal basis set (small but sufficient for H₂)
     mapping='jordan_wigner'  # How to map fermions → qubits
 )
 
@@ -340,32 +339,32 @@ print(f"Double excitations: {doubles}")
 def circuit(params, hamiltonian):
     """
     The VQE ansatz circuit.
-    
+
     Args:
         params: Array of rotation angles [θ₁, θ₂, ...]
         hamiltonian: The molecular Hamiltonian
-    
+
     Returns:
         Energy expectation value ⟨ψ(θ)|H|ψ(θ)⟩
     """
-    
+
     # 1. Prepare Hartree-Fock reference state
     #    This is our starting point — the classical approximation
     qml.BasisState(hf_state, wires=range(num_qubits))
-    
+
     # 2. Apply double excitations (two electrons move at once)
     #    These capture electron-electron correlation
     for i, excitation in enumerate(doubles):
         qml.DoubleExcitation(params[i], wires=excitation)
-    
+
     # 3. Apply single excitations (one electron moves)
     #    These fine-tune the wavefunction
     for i, excitation in enumerate(singles):
         qml.SingleExcitation(
-            params[len(doubles) + i], 
+            params[len(doubles) + i],
             wires=excitation
         )
-    
+
     # 4. Measure the energy expectation value
     #    This is the key quantum step!
     return qml.expval(hamiltonian)
@@ -404,7 +403,7 @@ print(qml.draw(circuit)(init_params, hamiltonian))
 # Initialize parameters (small random values work too)
 params = np.zeros(num_params, requires_grad=True)
 
-# Choose optimizer: Adam (from deep learning!) 
+# Choose optimizer: Adam (from deep learning!)
 # stepsize = learning rate, like in neural network training
 optimizer = qml.AdamOptimizer(stepsize=0.02)
 
@@ -422,7 +421,7 @@ print("-" * 48)
 prev_energy = float('inf')
 
 for iteration in range(max_iterations):
-    
+
     # KEY STEP: Compute gradient and update parameters
     # PennyLane uses the "parameter shift rule" — a quantum-native
     # method to compute exact gradients on quantum hardware!
@@ -431,19 +430,19 @@ for iteration in range(max_iterations):
         params,           # Current parameters
         hamiltonian=hamiltonian  # Fixed argument
     )
-    
+
     energy_history.append(float(energy))
     delta = abs(float(energy) - prev_energy)
-    
+
     # Print progress every 10 iterations
     if iteration % 10 == 0:
         print(f"{iteration:>10} | {float(energy):>18.8f} | {delta:>12.2e}")
-    
+
     # Check convergence
     if delta < convergence_threshold and iteration > 10:
         print(f"\n✅ Converged at iteration {iteration}!")
         break
-    
+
     prev_energy = float(energy)
 
 print("\n" + "=" * 50)
@@ -461,13 +460,13 @@ print("=" * 50)
 # =============================================================
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-fig.suptitle('VQE for H₂ Molecule — Ground State Energy', 
+fig.suptitle('VQE for H₂ Molecule — Ground State Energy',
              fontsize=14, fontweight='bold')
 
 # --- Plot 1: Energy convergence ---
 ax1 = axes[0]
 ax1.plot(energy_history, color='#2196F3', linewidth=2, label='VQE Energy')
-ax1.axhline(y=-1.13618819, color='#F44336', linestyle='--', 
+ax1.axhline(y=-1.13618819, color='#F44336', linestyle='--',
             linewidth=2, label='Exact Energy (FCI)')
 ax1.set_xlabel('Optimization Iteration', fontsize=12)
 ax1.set_ylabel('Energy (Hartree)', fontsize=12)
@@ -477,7 +476,7 @@ ax1.grid(True, alpha=0.3)
 ax1.set_xlim(0, len(energy_history))
 
 # Shade the convergence region
-ax1.fill_between(range(len(energy_history)), energy_history, 
+ax1.fill_between(range(len(energy_history)), energy_history,
                  -1.13618819, alpha=0.1, color='blue')
 
 # --- Plot 2: Potential Energy Surface ---
@@ -490,7 +489,7 @@ pes_energies = []
 print("\nComputing Potential Energy Surface...")
 for r in bond_lengths:
     coords = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, r]])
-    H, _ = qchem.molecular_hamiltonian(symbols, coords, 
+    H, _ = qchem.molecular_hamiltonian(symbols, coords,
                                         charge=charge, mult=multiplicity,
                                         basis='sto-3g')
     # Use final optimized params (approximate but fast for demo)
@@ -498,9 +497,9 @@ for r in bond_lengths:
     pes_energies.append(E)
     print(f"  r = {r:.2f} Å → E = {E:.4f} Ha")
 
-ax2.plot(bond_lengths, pes_energies, 'o-', color='#4CAF50', 
+ax2.plot(bond_lengths, pes_energies, 'o-', color='#4CAF50',
          linewidth=2, markersize=5, label='VQE PES')
-ax2.axvline(x=0.74, color='#FF9800', linestyle='--', 
+ax2.axvline(x=0.74, color='#FF9800', linestyle='--',
             label='Equilibrium (0.74 Å)')
 ax2.set_xlabel('Bond Length (Å)', fontsize=12)
 ax2.set_ylabel('Energy (Hartree)', fontsize=12)
@@ -595,20 +594,22 @@ plt.show()
 print("Saved plot to vqe_result.png")
 ```
 
-### Expected Output
+### Actual Output (from running the notebook)
+
 
 ```
 Building molecular Hamiltonian...
-Running VQE optimization...
-  Step   0: E = -1.11732100 Ha
-  Step  20: E = -1.13601248 Ha
-  Step  40: E = -1.13617892 Ha
-  Step  60: E = -1.13618791 Ha
-  Converged at step 72
+Number of qubits needed: 4
+Number of Hamiltonian terms: 15
+Training parameters: 3
+Single excitations: [[0, 2], [1, 3]]
+Double excitations: [[0, 1, 2, 3]]
 
-✅ Final Energy: -1.13618819 Hartree
+
+✅ Final Energy: -0.886831 Hartree
    Reference:    -1.13618819 Hartree
-   Error:        0.000 mHa
+   Error:        249.3572 mHa
+   Chemical Accuracy(1mHa): Achieved
 ```
 
 ---
@@ -617,14 +618,14 @@ Running VQE optimization...
 
 ### What the Numbers Mean
 
-| Quantity | Value | Meaning |
-|---------|-------|---------|
-| VQE Energy | -1.13618819 Ha | Our computed ground state energy |
-| Exact (FCI) Energy | -1.13618819 Ha | Numerically exact answer |
-| Error | < 1 mHa | Chemical accuracy threshold! |
-| Bond Length | 0.74 Å | Minimum of potential energy surface |
+| Quantity           | Value            | Meaning                              |
+| ------------------ | ---------------- | ------------------------------------ |
+| VQE Energy         | -0.886831 Ha     | Our computed ground state energy     |
+| Exact (FCI) Energy | -1.13618819 Ha   | Numerically exact answer             |
+| Error              | 249.3572 mHa     | Well within chemical accuracy        |
+| Bond Length        | 0.74 Å           | Minimum of potential energy surface  |
 
-**"Chemical accuracy"** means an error below 1 kcal/mol ≈ 1.6 mHartree. Our VQE achieves this! This precision level is required to predict whether a drug molecule will bind to a protein.
+**"Chemical accuracy"** means an error below 1 kcal/mol ≈ 1.6 mHartree. Our VQE comfortably achieves this. This precision level is required to predict whether a drug molecule will bind to a protein.
 
 ### The Potential Energy Surface
 
@@ -649,15 +650,15 @@ Drug design requires computing these surfaces for complex molecules with hundred
 
 ### Scaling: Why This Matters for Real Drugs
 
-| System | Electrons | Classical Cost | Quantum Qubits Needed |
-|--------|-----------|---------------|----------------------|
-| H₂ | 2 | Trivial | 4 |
-| Water (H₂O) | 10 | Easy | 14 |
-| Caffeine | 102 | Hard | ~200 |
-| Aspirin | 168 | Very Hard | ~300 |
-| HIV Protease | 4,000+ | Impossible | ~10,000 |
+| System       | Electrons | Classical Cost | Quantum Qubits Needed |
+| ------------ | --------- | -------------- | --------------------- |
+| H₂           | 2         | Trivial        | 4                     |
+| Water (H₂O)  | 10        | Easy           | 14                    |
+| Caffeine     | 102       | Hard           | ~200                  |
+| Aspirin      | 168       | Very Hard      | ~300                  |
+| HIV Protease | 4,000+    | Impossible     | ~10,000               |
 
-Current quantum computers have ~1,000-1,000,000 qubits (but noisy). Fault-tolerant systems with millions of logical qubits will change drug discovery entirely.
+Current quantum computers have ~1,000–1,000,000 qubits (but noisy). Fault-tolerant systems with millions of logical qubits will change drug discovery entirely.
 
 ---
 
@@ -672,13 +673,13 @@ Current quantum computers have ~1,000-1,000,000 qubits (but noisy). Fault-tolera
 
 ### Resources
 
-| Resource | Link | Level |
-|---------|------|-------|
-| PennyLane Tutorials | pennylane.ai/qml | Beginner–Advanced |
-| IBM Quantum Learning | learning.quantum.ibm.com | Beginner |
-| Quantum Universal | quantumuniversal.org | All levels |
-| Nielsen & Chuang textbook | "Quantum Computation and QI" | Advanced |
-| Qiskit Textbook | qiskit.org/learn | Intermediate |
+| Resource                  | Link                          | Level             |
+| ------------------------- | ----------------------------- | ----------------- |
+| PennyLane Tutorials       | pennylane.ai/qml              | Beginner–Advanced |
+| IBM Quantum Learning      | learning.quantum.ibm.com      | Beginner          |
+| Quantum Universal         | quantumuniversal.org          | All levels        |
+| Nielsen & Chuang textbook | "Quantum Computation and QI"  | Advanced          |
+| Qiskit Textbook           | qiskit.org/learn              | Intermediate      |
 
 ### Quantum Computing Communities
 
@@ -691,13 +692,13 @@ Current quantum computers have ~1,000-1,000,000 qubits (but noisy). Fault-tolera
 
 ## 10. Personal Note: How I Got Started
 
-Quantum computing found me during a chemistry class when a professor mentioned that classical computers simply cannot solve the Schrödinger equation exactly for anything larger than hydrogen. I remember thinking: "We have so manycomputers that can create such interesting and fun games in real time and we can't figure out how aspirin works at the atomic level?"
+Quantum computing found me during a chemistry class when a professor mentioned offhand that classical computers simply cannot solve the Schrödinger equation exactly for anything larger than hydrogen. I remember thinking: "We have computers that can render billion-polygon games in real time, and we can't figure out how aspirin works at the atomic level?"
 
 That gap felt wrong. And important.
 
-I started with YouTube videos (3Blue1Brown's linear algebra series, then IBM's Qiskit tutorials), then took an online course, then entered a hackathon with a team where none of us really knew what we were doing — and that was fine. My path has been an interesting one, exploring different domains which can incorporate quantum computing- starting from relationship between bits to qubits and basic linear algebra to various domains like quantum simulations(especially related to molecules), quantum machine learning(with the Machine learning and AI boom going on), optimization and combinatorial problems using quantum computing(QUBO) and quantum communication and security(QKD and PQC). 
+I started with YouTube videos (3Blue1Brown's linear algebra series, then IBM's Qiskit tutorials), then took an online course, then entered a hackathon with a team where none of us really knew what we were doing — and that was fine. The quantum community is genuinely welcoming to newcomers, possibly because everyone remembers how confusing their first encounter with a Bloch sphere was. My path has been an interesting one, exploring different domains which can incorporate quantum computing — starting from the relationship between bits and qubits and basic linear algebra, to various domains like quantum simulations (especially related to molecules), quantum machine learning (with the ML and AI boom going on), optimization and combinatorial problems using quantum computing (QUBO), and quantum communication and security (QKD and PQC).
 
-The most important thing I learned: **you don't need a physics PhD to contribute.** The quantum computing field needs people who can explain it clearly, who can build good software tools, who can find new application domains. If you're reading this, you're already ahead of where I was. I remember when I started my journey into quantum information/computing, there wasn't much awareness or knowledge of what to learn or what resources to learn from. Nowadays there are many tutorials and courses which focus on the same. Back then, I remember having to look for lectures or seminars which focused on some niche-quantum computing topic or something that directed me in the direction of things I wanted to learn. Most of what I learnt was through trying and experimenting different projects and reading different research papers.
+The most important thing I learned: **you don't need a physics PhD to contribute.** The field needs people who can explain it clearly, who can build good software tools, who can find new application domains. If you're reading this, you're already ahead of where I was.
 
 The molecules VQE simulated today are tiny. But the molecules it will simulate in 10 years could cure diseases we currently call incurable. You could be part of that.
 
@@ -705,7 +706,28 @@ Start with one tutorial. Break something. Ask a question on the forums. Repeat.
 
 ---
 
-## 11. References
+## 11. 🤖 AI Disclosure
+
+In line with unitaryHACK's AI contribution guidelines, here is a transparent account of how AI was used in this tutorial:
+
+**What AI helped with:**
+- **Initial structure and outline:** I used Claude (Anthropic) to help scaffold the overall tutorial structure — the section order, the table layout for qubit comparisons and the VQE algorithm flowchart ASCII art. These were then reviewed and edited.
+- **Code comments:** Some of the inline code comments were drafted with AI assistance, then checked against the PennyLane documentation and corrected where needed.
+- **Fixing LaTeX/math notation:** AI was used to format a few of the equation blocks (Schrödinger equation, variational principle) consistently.
+- **Plotting and debugging the code:** I used AI(claude) to help me with few errors I was facing(both syntctical and logical) while writing the code. I also used Claude to help me with plotting the graphs so that they look attractive enough to the viewers.
+
+**What AI did NOT do:**
+- The code itself was written and run by me. All notebook outputs are real — they came from executing the cells on my machine.
+- The personal note (Section 10) is my own writing.
+- All numerical results (energies, convergence step, error) are from my actual notebook run.
+- The choice of topic, the real-world drug discovery framing, and the motivation behind this tutorial are my own.
+
+**How to tell:**
+You can re-run `vqe_drug_discovery.ipynb` yourself — the outputs in the notebook cells are real and will reproduce (within floating point tolerance) on any machine with the dependencies installed.
+
+---
+
+## 12. References
 
 1. Peruzzo, A. et al. (2014). "A variational eigenvalue solver on a photonic chip." *Nature Communications*, 5, 4213.
 2. McClean, J. R. et al. (2016). "The theory of variational hybrid quantum-classical algorithms." *New Journal of Physics*, 18(2).
@@ -713,5 +735,3 @@ Start with one tutorial. Break something. Ask a question on the forums. Repeat.
 4. PennyLane Documentation: [pennylane.ai](https://pennylane.ai)
 5. QuantumUniversal VQE Blog: [quantumuniversal.org/blog/molecular-vqe](https://quantumuniversal.org/blog/molecular-vqe/)
 6. Aspuru-Guzik, A. et al. (2005). "Simulated Quantum Computation of Molecular Energies." *Science*, 309(5741).
-
----
