@@ -1,6 +1,7 @@
 # 🔬 Quantum Computing for Drug Discovery: Finding the Ground State of Molecules
 
 **Tutorial: Quantum Applications in Real Life**
+**Video Link: https://drive.google.com/file/d/1km6coIDKt2OmH7g_CzwLtraj1NIYwI5W/view?usp=sharing **
 
 ---
 
