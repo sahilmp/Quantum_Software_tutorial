@@ -3,6 +3,9 @@
 **Tutorial: Quantum Applications in Real Life**
 
 ---
+**Video Link:** https://drive.google.com/file/d/1km6coIDKt2OmH7g_CzwLtraj1NIYwI5W/view?usp=sharing 
+
+---
 
 > **Who is this for?** High school students curious about quantum computing, undergraduate students in chemistry, physics, or CS, and anyone who wants to see how quantum computers might change medicine.
 
@@ -534,7 +537,7 @@ In line with unitaryHACK's AI contribution guidelines, here is a transparent acc
 - **Code comments:** Some of the inline code comments were drafted with AI assistance, then checked against the PennyLane documentation and corrected where needed.
 - **Fixing LaTeX/math notation:** AI was used to format a few of the equation blocks (Schrödinger equation, variational principle) consistently.
 - **Plotting and debugging the code:** I used AI (Claude) to help me with a few errors I was facing (both syntactical and logical) while writing the code. I also used Claude to help me with plotting the graphs so that they look attractive enough to viewers.
-- **README update:** Claude was used to update this README to match the actual notebook outputs after code revisions.
+- **Markdown file update:** Claude was used to update this Markdown file to match the actual notebook outputs after code revisions.
 
 **What AI did NOT do:**
 - The code itself was written and run by me. All notebook outputs are real — they came from executing the cells on my machine.
